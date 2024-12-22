@@ -3,7 +3,7 @@
 import gleam/dynamic
 import gleam/json
 import gleam/result
-import gleam/string_builder
+import gleam/string_tree
 import gleatter
 
 /// The type of body that can be expected from a Route
@@ -16,7 +16,7 @@ pub type BodyType {
 /// A wrapper for an encoder and a decoder to convert from request/response data to and from a Gleam type
 pub type BodyConverter(body_type) {
   BodyConverter(
-    encoder: fn(body_type) -> string_builder.StringBuilder,
+    encoder: fn(body_type) -> string_tree.StringTree,
     decoder: fn(String) -> Result(body_type, gleatter.GleatterError),
   )
 }
@@ -31,7 +31,7 @@ pub fn empty_body() -> RouteBody(Nil) {
   RouteBody(
     EmptyBody,
     BodyConverter(
-      fn(_) { string_builder.new() },
+      fn(_) { string_tree.new() },
       //
       fn(_) { Ok(Nil) },
     ),
@@ -46,7 +46,7 @@ pub fn json_body(
   RouteBody(
     JsonBody,
     BodyConverter(
-      fn(value) { value |> encoder |> json.to_string_builder },
+      fn(value) { value |> encoder |> json.to_string_tree },
       //
       fn(body) {
         json.decode(from: body, using: decoder)
@@ -62,7 +62,7 @@ pub fn string_body(converter: BodyConverter(b)) -> RouteBody(b) {
 }
 
 /// Encode a value using the RouteBody's encoder into a StringBuilder
-pub fn encode(body: RouteBody(b), value: b) -> string_builder.StringBuilder {
+pub fn encode(body: RouteBody(b), value: b) -> string_tree.StringTree {
   value |> body.converter.encoder
 }
 

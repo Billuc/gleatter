@@ -1,6 +1,6 @@
 import gleam/http/request
 import gleam/string
-import gleam/string_builder
+import gleam/string_tree
 import gleatter/body
 import gleatter/path
 import gleatter/query
@@ -20,7 +20,7 @@ pub fn to_request(
     |> request.set_path(route.path |> path.encode(path) |> string.join("/"))
     |> request.set_query(route.query |> query.encode(query))
     |> request.set_body(
-      route.req_body |> body.encode(body) |> string_builder.to_string,
+      route.req_body |> body.encode(body) |> string_tree.to_string,
     )
 
   let req = case route.req_body |> body.get_type {
